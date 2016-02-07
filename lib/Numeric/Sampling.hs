@@ -12,6 +12,10 @@ module Numeric.Sampling (
   , resample
   , resampleIO
 
+    -- * Unequal probability sampling without replacement
+  , probSample
+  , probSampleIO
+
     -- * Unequal probability sampling with replacement
   , probResample
   , probResampleIO
@@ -46,6 +50,24 @@ sampleIO n xs = do
   gen <- createSystemRandom
   sample n xs gen
 
+-- | (/O(n)/) Sample uniformly with replacement (bootstrap).
+resample
+  :: (PrimMonad m, Foldable f)
+  => Int -> f a -> Gen (PrimState m) -> m (Vector a)
+resample n xs = probResample n weighted where
+  weight   = recip (F.fold F.genericLength xs)
+  weighted = zip (repeat weight) (Foldable.toList xs)
+
+-- | (/O(n)/) 'resample' specialized to IO.
+resampleIO :: Foldable f => Int -> f a -> IO (Vector a)
+resampleIO n xs = do
+  gen <- createSystemRandom
+  resample n xs gen
+
+
+
+
+
 probResample
   :: (PrimMonad m, Foldable f)
   => Int -> f (Double, a) -> Gen (PrimState m) -> m (Vector a)
@@ -55,36 +77,26 @@ probResample n weighted gen
         -- let vweighted = V.fromList $ Foldable.toList weighted
         -- sorted <- mutableSortBy descendingOnFirst vweighted
         let lweighted = Foldable.toList weighted
-            sorted    = V.fromList $ sortProbs lweighted
-        let probs     = V.scanl1' (+) $ fmap fst sorted
-            cdf       = V.zip probs (fmap snd sorted)
+            sorted    = sortProbs lweighted
+        let probs     = F.scan (F.premap fst F.sum) sorted
+            cdf       = V.fromList $ zip probs (fmap snd sorted)
         accumulateSample n cdf gen
   where
     accumulateSample
       :: PrimMonad m
       => Int -> Vector (Double, a) -> Gen (PrimState m) -> m (Vector a)
-    accumulateSample size xs g = go [] size where
+    accumulateSample size xs g = go V.empty size where
       go !acc s
-        | s <= 0    = return $! V.fromList acc
+        | s <= 0    = return $! acc
         | otherwise = do
             z <- uniform g
-            let result = snd . fromJust . V.find ((>= z) . fst) $ xs -- FIXME fromJust
-            go (result : acc) (pred s)
+            let result = snd . fromJust . F.fold (F.find ((>= z) . fst)) $ xs -- FIXME fromJust
+            go (V.cons result acc) (pred s)
 
 probResampleIO :: Foldable f => Int -> f (Double, a) -> IO (Vector a)
 probResampleIO n weighted = do
   gen <- createSystemRandom
   probResample n weighted gen
-
-resample :: (PrimMonad m, Foldable f) => Int -> f a -> Gen (PrimState m) -> m (Vector a)
-resample n xs = probResample n weighted where
-  len      = F.fold F.length xs
-  weighted = zip (repeat (1 / fromIntegral len)) (Foldable.toList xs)
-
-resampleIO :: Foldable f => Int -> f a -> IO (Vector a)
-resampleIO n xs = do
-  gen <- createSystemRandom
-  resample n xs gen
 
 
 sortProbs :: Ord a => [(a, b)] -> [(a, b)]
@@ -119,13 +131,7 @@ descendingOnFirst :: Ord a => (a, b) -> (a, b) -> Ordering
 descendingOnFirst = flip compare `on` fst
 
 
-
--- probSample = undefined
--- probSampleIO = undefined
--- resample = undefined
--- resampleIO = undefined
--- probResample = undefined
--- probResampleIO = undefined
--- streams?
+probSample = undefined
+probSampleIO = undefined
 
 
