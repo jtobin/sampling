@@ -2,7 +2,7 @@
 
 module Main where
 
-import Numeric.Sampling.Functional
+import Numeric.Sampling
 
 main :: IO ()
 main = do

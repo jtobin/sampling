@@ -37,7 +37,6 @@ library
       base        < 5
     , foldl
     , mwc-random
-    , data-ordlist
     , primitive
     , vector
     , vector-algorithms

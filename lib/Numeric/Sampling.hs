@@ -20,9 +20,10 @@ module Numeric.Sampling (
 import qualified Control.Foldl               as F
 import           Control.Monad.Primitive     (PrimMonad, PrimState)
 import qualified Data.Foldable               as Foldable
+import           Data.Function               (on)
+import           Data.List                   (sortBy)
 import           Data.Maybe                  (fromJust)
 import           Data.Vector                 (Vector)
-import qualified Data.Vector                 as V
 import           Numeric.Sampling.Internal
 import           System.Random.MWC
 
@@ -48,14 +49,14 @@ sampleIO n xs = do
 -- | (/O(n log n)/) Sample uniformly with replacement (bootstrap).
 resample
   :: (PrimMonad m, Foldable f)
-  => Int -> f a -> Gen (PrimState m) -> m (Vector a)
+  => Int -> f a -> Gen (PrimState m) -> m [a]
 resample n xs = presample n weighted where
   weight   = recip (F.fold F.genericLength xs)
   weighted = zip (repeat weight) (Foldable.toList xs)
 {-# INLINABLE resample #-}
 
 -- | (/O(n log n)/) 'resample' specialized to IO.
-resampleIO :: (Foldable f) => Int -> f a -> IO (Vector a)
+resampleIO :: (Foldable f) => Int -> f a -> IO [a]
 resampleIO n xs = do
   gen <- createSystemRandom
   resample n xs gen
@@ -64,31 +65,32 @@ resampleIO n xs = do
 -- | (/O(n log n)/) Unequal probability resampling.
 presample
   :: (PrimMonad m, Foldable f)
-  => Int -> f (Double, a) -> Gen (PrimState m) -> m (Vector a)
+  => Int -> f (Double, a) -> Gen (PrimState m) -> m [a]
 presample n weighted gen
-    | n <= 0    = return V.empty
+    | n <= 0    = return []
     | otherwise = do
-        let vweighted = V.fromList $ Foldable.toList weighted
-        sorted <- mutableSortByProbability vweighted
-        let probs     = drop 1 (F.scan (F.premap fst F.sum) (V.toList sorted))
-            cdf       = V.zip (V.fromList probs) (V.map snd sorted)
-        accumulateSample n cdf gen
+        let (bprobs, vals) = unzip $ sortProbs weighted
+            probs          = drop 1 (F.scan F.sum bprobs)
+            cumulative     = zip probs vals
+        computeSample n cumulative gen
   where
-    accumulateSample
-      :: (PrimMonad m)
-      => Int -> Vector (Double, a) -> Gen (PrimState m) -> m (Vector a)
-    accumulateSample size xs g = go V.empty size where
+    computeSample
+      :: PrimMonad m => Int -> [(Double, a)] -> Gen (PrimState m) -> m [a]
+    computeSample size xs g = go [] size where
       go !acc s
-        | s <= 0    = return $! acc
+        | s <= 0    = return acc
         | otherwise = do
             z <- uniform g
-            let pair   = F.fold (F.find ((>= z) . fst)) xs
-                result = snd . fromJust $ pair -- FIXME
-            go (V.cons result acc) (pred s)
+            let (_, v) = fromJust $ F.fold (F.find ((>= z) . fst)) xs
+            go (v:acc) (pred s)
+
+    sortProbs :: (Foldable f, Ord a) => f (a, b) -> [(a, b)]
+    sortProbs = sortBy (compare `on` fst) . Foldable.toList
+
 {-# INLINABLE presample #-}
 
 -- | (/O(n log n)/) 'presample' specialized to IO.
-presampleIO :: (Foldable f) => Int -> f (Double, a) -> IO (Vector a)
+presampleIO :: (Foldable f) => Int -> f (Double, a) -> IO [a]
 presampleIO n weighted = do
   gen <- createSystemRandom
   presample n weighted gen

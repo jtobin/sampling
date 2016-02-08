@@ -1,39 +1,18 @@
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE DeriveFunctor #-}
 
-module Numeric.Sampling.Functional (
-    resample
-  , resampleIO
-  ) where
+module Numeric.Sampling.Functional where
 
 import qualified Control.Foldl as F
 import Control.Monad.Primitive (PrimMonad, PrimState)
 import qualified Data.Foldable as Foldable (toList)
 import Data.Function (on)
-import Data.List.Ordered (mergeBy)
+import Data.List (sortBy)
 import Data.Maybe (fromJust)
 import System.Random.MWC
 
-data TreeF a r =
-    EmptyF
-  | LeafF a
-  | NodeF r r
-  deriving Functor
-
 sortProbs :: (Foldable f, Ord a) => f (a, b) -> [(a, b)]
-sortProbs = hylo alg coalg . Foldable.toList where
-  alg EmptyF      = []
-  alg (LeafF x)   = [x]
-  alg (NodeF l r) = mergeBy (compare `on` fst) l r
-
-  coalg []  = EmptyF
-  coalg [x] = LeafF x
-  coalg xs  = NodeF l r where
-    (l, r) = splitAt (length xs `div` 2) xs
-
-  hylo :: Functor f => (f a -> a) -> (b -> f b) -> b -> a
-  hylo f g = h where h = f . fmap h . g
+sortProbs = sortBy (compare `on` fst) . Foldable.toList
 
 presample
   :: (PrimMonad m, Foldable f)
@@ -55,20 +34,11 @@ presample n weighted gen
             z <- uniform g
             let (_, v) = fromJust $ F.fold (F.find ((>= z) . fst)) xs
             go (v:acc) (pred s)
+{-# INLINABLE presample #-}
 
 presampleIO :: Foldable f => Int -> f (Double, a) -> IO [a]
 presampleIO n weighted = do
   gen <- createSystemRandom
   presample n weighted gen
+{-# INLINABLE presampleIO #-}
 
-resample
-  :: (PrimMonad m, Foldable f) => Int -> f a -> Gen (PrimState m) -> m [a]
-resample n xs gen = do
-  let len      = F.fold F.genericLength xs
-      weighted = zip (repeat (1 / len)) (Foldable.toList xs)
-  presample n weighted gen
-
-resampleIO :: Foldable f => Int -> f a -> IO [a]
-resampleIO n xs = do
-  gen <- createSystemRandom
-  resample n xs gen
