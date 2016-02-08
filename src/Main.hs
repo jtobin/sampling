@@ -2,7 +2,7 @@
 
 module Main where
 
-import Numeric.Sampling (resampleIO)
+import Numeric.Sampling (sampleIO, resampleIO)
 
 main :: IO ()
 main = do
