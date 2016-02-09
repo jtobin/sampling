@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE BangPatterns     #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module Numeric.Sampling (
@@ -23,6 +24,9 @@ module Numeric.Sampling (
 import qualified Control.Foldl               as F
 import           Control.Monad.Primitive     (PrimMonad, PrimState)
 import qualified Data.Foldable               as Foldable
+#if __GLASGOW_HASKELL__ < 710
+import Data.Foldable (Foldable)
+#endif
 import           Data.Function               (on)
 import           Data.List                   (sortBy)
 import           Data.Vector                 (Vector)

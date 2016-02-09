@@ -3,7 +3,6 @@
 module Main where
 
 import Numeric.Sampling
-import qualified Data.Map.Strict as Map
 
 main :: IO ()
 main = do
