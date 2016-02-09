@@ -1,23 +1,22 @@
 sudo: false
-
-env:
-  STACK_YAML: stack.yml
-
-cache:
-  directories:
-    - "~/.stack"
-
-before_install:
-  - mkdir -p ~/.local/bin
-  - export PATH=~/.local/bin:$PATH
-  - travis_retry curl -L https://github.com/commercialhaskell/stack/releases/download/v0.1.10.1/stack-0.1.10.1-${TRAVIS_OS_NAME}-x86_64.tar.gz | tar xz
-  - mv stack-0.1.10.1-${TRAVIS_OS_NAME}-x86_64/stack ~/.local/bin
-
-install:
-  - stack --no-terminal --skip-ghc-check setup
-  - stack --no-terminal --skip-ghc-check build --copy-bins
+language: c
 
 addons:
   apt:
-    packages: [libgmp-dev]
+    packages:
+    - libgmp-dev
 
+env:
+- ARGS="--resolver lts-5.1"
+- ARGS="--resolver nightly"
+
+before_install:
+- mkdir -p ~/.local/bin
+- export PATH=$HOME/.local/bin:$PATH
+- travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
+script: stack $ARGS --no-terminal --install-ghc test --haddock
+
+cache:
+  directories:
+  - $HOME/.stack
