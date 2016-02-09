@@ -1,5 +1,5 @@
 name:                sampling
-version:             0.1.0
+version:             0.1.1
 synopsis:            Sample values from collections.
 homepage:            https://github.com/jtobin/sampling
 license:             MIT

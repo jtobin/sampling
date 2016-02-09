@@ -1,11 +1,2 @@
 sudo: false
-env:
-  STACK_YAML: stack.yml
-
-install:
-  - stack --no-terminal --skip-ghc-check setup
-  - stack --no-terminal --skip-ghc-check build --copy-bins
-
-script:
-  - stack --no-terminal --skip-ghc-check test --flag "*":release
-
+language: haskell
