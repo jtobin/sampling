@@ -15,6 +15,9 @@ module Numeric.Sampling (
     -- * Unequal probability, with replacement
   , presample
   , presampleIO
+
+    -- * Re-exported
+  , module System.Random.MWC
   ) where
 
 import qualified Control.Foldl               as F
@@ -22,7 +25,6 @@ import           Control.Monad.Primitive     (PrimMonad, PrimState)
 import qualified Data.Foldable               as Foldable
 import           Data.Function               (on)
 import           Data.List                   (sortBy)
-import           Data.Maybe                  (fromJust)
 import           Data.Vector                 (Vector)
 import           Numeric.Sampling.Internal
 import           System.Random.MWC
@@ -81,12 +83,12 @@ presample n weighted gen
         | s <= 0    = return acc
         | otherwise = do
             z <- uniform g
-            let (_, v) = fromJust $ F.fold (F.find ((>= z) . fst)) xs
-            go (v:acc) (pred s)
+            case F.fold (F.find ((>= z) . fst)) xs of
+              Just (_, val) -> go (val:acc) (pred s)
+              Nothing       -> return acc
 
     sortProbs :: (Foldable f, Ord a) => f (a, b) -> [(a, b)]
     sortProbs = sortBy (compare `on` fst) . Foldable.toList
-
 {-# INLINABLE presample #-}
 
 -- | (/O(n log n)/) 'presample' specialized to IO.

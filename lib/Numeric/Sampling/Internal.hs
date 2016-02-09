@@ -30,15 +30,11 @@
 
 module Numeric.Sampling.Internal (
     randomN
-
-  , mutableSortByProbability
   ) where
 
 import           Control.Foldl               (FoldM (..))
 import           Control.Monad               (when)
 import           Control.Monad.Primitive
-import           Data.Function                (on)
-import qualified Data.Vector.Algorithms.Intro as V
 import           Data.Vector.Generic         (Mutable, Vector)
 import qualified Data.Vector.Generic         as V
 import           Data.Vector.Generic.Mutable (MVector)
@@ -83,13 +79,4 @@ randomN n gen = FoldM step begin done where
       v <- V.freeze mv
       return (Just v)
 {-# INLINABLE randomN #-}
-
--- | Wrapper over the mutable sort process.
-mutableSortByProbability
-  :: (Vector v (Double, a), PrimMonad m) => v (Double, a) -> m (v (Double, a))
-mutableSortByProbability xs = do
-  warm <- V.unsafeThaw xs
-  V.sortBy (flip compare `on` fst) warm
-  cool <- V.unsafeFreeze warm
-  return $! cool
 
