@@ -1,6 +1,11 @@
 resolver: lts-5.1
-packages:
-- '.'
+system-ghc: false
+install-ghc: true
+compiler: ghc-7.10.3
+compiler-check: newer-minor
+require-stack-version: ">= 0.1.7"
+
+packages: ['.']
 extra-deps: []
 flags: {}
 extra-package-dbs: []

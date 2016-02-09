@@ -3,6 +3,16 @@ sudo: false
 env:
   STACK_YAML: stack.yml
 
+cache:
+  directories:
+    - "~/.stack"
+
+before_install:
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  - travis_retry curl -L https://github.com/commercialhaskell/stack/releases/download/v0.1.10.1/stack-0.1.10.1-${TRAVIS_OS_NAME}-x86_64.tar.gz | tar xz
+  - mv stack-0.1.10.1-${TRAVIS_OS_NAME}-x86_64/stack ~/.local/bin
+
 install:
   - stack --no-terminal --skip-ghc-check setup
   - stack --no-terminal --skip-ghc-check build --copy-bins
