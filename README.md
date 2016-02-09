@@ -30,16 +30,16 @@ The non-`IO` specialized functions can be used with any `PrimMonad`.
 
 ## Examples
 
-Sample ten elements from a list, with replacement:
+Sample five elements from a list, without replacement:
 
-    > resampleIO 10 ['a'..'g']
-    "ddgaefbgef"
+    > sampleIO 10 ['a'..'z']
+    Just "azctumlhwj"
 
-Sample five elements from a Map, without replacement:
+Sample five elements from a Map, with replacement:
 
     > import qualified Data.Map.Strict as Map
-    > sampleIO 5 (Map.fromList (zip [1..1000] (scanl1 (/) [1..])))
-    Just [0.0,1.0126536951759521e-203,2.9893108271424046e-50,0.0,0.0]
+    > sampleIO 5 (Map.fromList [(1, "apple"), (2, "orange"), (3, "pear")])
+    ["apple", "apple", "pear", "orange", "pear"]
 
 ## Development
 
