@@ -30,7 +30,7 @@ The non-`IO` specialized functions can be used with any `PrimMonad`.
 
 ## Examples
 
-Sample five elements from a list, without replacement:
+Sample ten elements from a list, without replacement:
 
     > sampleIO 10 ['a'..'z']
     Just "azctumlhwj"
