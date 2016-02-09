@@ -41,6 +41,13 @@ Sample five elements from a Map, without replacement:
     > sampleIO 5 (Map.fromList (zip [1..1000] (scanl1 (/) [1..])))
     Just [0.0,1.0126536951759521e-203,2.9893108271424046e-50,0.0,0.0]
 
+## Development
+
+On the todo list:
+
+* Performance improvements
+* A *psample* function to go with *presample*
+
 ## Etc.
 
 PRs and issues welcome.
