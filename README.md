@@ -38,7 +38,7 @@ Sample ten elements from a list, without replacement:
 Sample five elements from a Map, with replacement:
 
     > import qualified Data.Map.Strict as Map
-    > sampleIO 5 (Map.fromList [(1, "apple"), (2, "orange"), (3, "pear")])
+    > resampleIO 5 (Map.fromList [(1, "apple"), (2, "orange"), (3, "pear")])
     ["apple", "apple", "pear", "orange", "pear"]
 
 ## Development
