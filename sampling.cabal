@@ -34,10 +34,10 @@ library
       Numeric.Sampling
   build-depends:
       base        < 5
-    , foldl
-    , mwc-random
+    , foldl       >= 1.1 && < 2
+    , mwc-random  >= 0.13 && < 0.14
     , primitive
-    , vector
+    , vector      >= 0.11 && < 0.12
 
 executable sampling-test
   hs-source-dirs: src
