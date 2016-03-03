@@ -29,7 +29,7 @@ import Data.Foldable (Foldable)
 #endif
 import           Data.Function               (on)
 import           Data.List                   (sortBy)
-import           Data.Vector                 (Vector)
+import qualified Data.Vector                 as V (toList)
 import           Numeric.Sampling.Internal
 import           System.Random.MWC
 
@@ -39,14 +39,14 @@ import           System.Random.MWC
 --   being sampled from.
 sample
   :: (PrimMonad m, Foldable f)
-  => Int -> f a -> Gen (PrimState m) -> m (Maybe (Vector a))
+  => Int -> f a -> Gen (PrimState m) -> m (Maybe [a])
 sample n xs gen
   | n < 0     = return Nothing
-  | otherwise = F.foldM (randomN n gen) xs
+  | otherwise = fmap (fmap V.toList) (F.foldM (randomN n gen) xs)
 {-# INLINABLE sample #-}
 
 -- | (/O(n)/) 'sample' specialized to IO.
-sampleIO :: Foldable f => Int -> f a -> IO (Maybe (Vector a))
+sampleIO :: Foldable f => Int -> f a -> IO (Maybe [a])
 sampleIO n xs = do
   gen <- createSystemRandom
   sample n xs gen
