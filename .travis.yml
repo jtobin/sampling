@@ -8,7 +8,6 @@ addons:
 
 env:
 - ARGS="--resolver lts-5.1"
-- ARGS="--resolver nightly"
 
 before_install:
 - mkdir -p ~/.local/bin
