@@ -2,6 +2,8 @@
 
 [![Build Status](https://secure.travis-ci.org/jtobin/sampling.png)](http://travis-ci.org/jtobin/sampling)
 [![Hackage Version](https://img.shields.io/hackage/v/sampling.svg)](http://hackage.haskell.org/package/sampling)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jtobin/sampling/blob/master/LICENSE)
+
 
 Basic sampling functionality.
 
