@@ -13,6 +13,9 @@ Exports variations on two simple functions for sampling from arbitrary
 * *sample*, for sampling without replacement
 * *resample*, for sampling with replacement (i.e. a bootstrap)
 
+Each variation can be prefixed with 'p' to sample from a container of values
+weighted by probability.
+
 ## Usage
 
 *sampling* uses the PRNG provided by
@@ -43,13 +46,7 @@ Sample five elements from a Map, with replacement:
     > resampleIO 5 (Map.fromList [(1, "apple"), (2, "orange"), (3, "pear")])
     ["apple", "apple", "pear", "orange", "pear"]
 
-## Development
-
-On the todo list:
-
-* Performance improvements
-* A *psample* function to go with *presample*
-
 ## Etc.
 
 PRs and issues welcome.
+
