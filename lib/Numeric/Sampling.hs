@@ -55,9 +55,7 @@ sample n xs gen
 
 -- | (/O(n)/) 'sample' specialized to IO.
 sampleIO :: Foldable f => Int -> f a -> IO (Maybe [a])
-sampleIO n xs = do
-  gen <- createSystemRandom
-  sample n xs gen
+sampleIO n xs = withSystemRandom . asGenIO $ sample n xs
 {-# INLINABLE sampleIO #-}
 
 -- | (/O(n log n)/) Sample uniformly with replacement (bootstrap).
@@ -71,9 +69,7 @@ resample n xs = presample n weighted where
 
 -- | (/O(n log n)/) 'resample' specialized to IO.
 resampleIO :: Foldable f => Int -> f a -> IO [a]
-resampleIO n xs = do
-  gen <- createSystemRandom
-  resample n xs gen
+resampleIO n xs = withSystemRandom . asGenIO $ resample n xs
 {-# INLINABLE resampleIO #-}
 
 -- | (/O(n log n)/) Unequal probability sampling.
