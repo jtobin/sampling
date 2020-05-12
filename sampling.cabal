@@ -1,5 +1,5 @@
 name:                sampling
-version:             0.3.3
+version:             0.3.4
 synopsis:            Sample values from collections.
 homepage:            https://github.com/jtobin/sampling
 license:             MIT
@@ -8,6 +8,7 @@ author:              Jared Tobin
 maintainer:          jared@jtobin.ca
 category:            Math
 build-type:          Simple
+tested-with:         GHC == 8.2.2, GHC == 8.8.3
 cabal-version:       >=1.10
 description:
   Basic sampling tools.
