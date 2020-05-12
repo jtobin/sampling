@@ -33,7 +33,9 @@ import Data.Foldable (Foldable)
 #endif
 import Data.Function (on)
 import Data.List (sortBy)
+#if __GLASGOW_HASKELL__ < 800
 import Data.Monoid
+#endif
 import qualified Data.Sequence as S
 import qualified Data.Vector as V (toList)
 import Numeric.Sampling.Internal
