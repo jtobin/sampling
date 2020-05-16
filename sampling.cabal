@@ -37,9 +37,9 @@ library
   exposed-modules:
       Numeric.Sampling
   build-depends:
-      base        > 4.8 && < 6
-    , containers  >= 0.5 && < 1
-    , foldl       >= 1.1 && < 2
+      base        >  4.8  && < 6
+    , containers  >= 0.5  && < 1
+    , foldl       >= 1.1  && < 2
     , mwc-random  >= 0.13 && < 0.15
     , primitive   >= 0.6  && < 1
     , vector      >= 0.11 && < 1
