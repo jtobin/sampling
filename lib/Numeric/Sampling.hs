@@ -76,8 +76,11 @@ resampleIO n xs = withSystemRandom . asGenIO $ resample n xs
 
 -- | (/O(n log n)/) Unequal probability sampling.
 --
---   Returns Nothing if the desired sample size is larger than the collection
---   being sampled from.
+--   Each element in the container must be paired with a probability to
+--   weight it by, and they must sum to 1.
+--
+--   Returns Nothing if the desired sample size is larger than the
+--   collection being sampled from.
 psample
   :: (PrimMonad m, Foldable f)
   => Int -> f (Double, a) -> Gen (PrimState m) -> m (Maybe [a])
@@ -115,6 +118,9 @@ psampleIO n weighted = withSystemRandom . asGenIO $ psample n weighted
 {-# INLINABLE psampleIO #-}
 
 -- | (/O(n log n)/) Unequal probability resampling.
+--
+--   Each element in the container must be paired with a probability to
+--   weight it by, and they must sum to 1.
 presample
   :: (PrimMonad m, Foldable f)
   => Int -> f (Double, a) -> Gen (PrimState m) -> m [a]
